@@ -18,6 +18,15 @@ hh的小工具 v1.0.1
 import random
 import time
 
+
+class HHError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        logs("程序错误:" + str(self.value),True)
+        return repr(self.value)
+
 def uijm(a):
     """
     帮助文档：
@@ -464,9 +473,12 @@ import os
 if "logs" not in os.listdir(os.getcwd()):
     os.mkdir("logs")
 file_neme = "logs\\log" + strftime("%Y%m%d%H%M%S") + ".txt"
+logsopen=True
+def logsinit(tf):
+    global logsopen
+    logsopen=tf
 
-
-def logs(log, lx=0):
+def logs(log, lx=0,tf=False):
     """
     帮助文档：
     该函数参数：（日志内容，日志等级）
@@ -486,34 +498,39 @@ def logs(log, lx=0):
     elif lx == 5:
         dj = "[Start]"
     elif lx == 6:
-        dj = "[Minecraft]"
+        dj = "[HH Code]"
     elif lx == 7:
         dj = "[Launch]"
+    elif lx == 8:
+        dj = "[HH Code RUNNING]"
     else:
-        dj = "【未分类】"
+        dj = ""
     """
-    if lx == 0:
-        dj = "[MAIN]"
-    elif lx == 1:
-        dj = "[logs]"
-    elif lx == 2:
-        dj = "[debug]"
-    elif lx == 3:
-        dj = "[!!!ERROR!!!]"
-    elif lx == 4:
-        dj = "[I/O]"
-    elif lx == 5:
-        dj = "[Start]"
-    elif lx == 6:
-        dj = "[Minecraft]"
-    elif lx == 7:
-        dj = "[Launch]"
-    else:
-        dj = "【未分类】"
-    file = open(file_neme, "a")
-    print("[" + strftime("%Y/%m/%d,%H:%M:%S") + "]" + dj + " " + str(log))
-    file.write("[" + strftime("%Y/%m/%d,%H:%M:%S") + "]" + dj + " " + str(log) + "\n")
-    file.close()
+    if logsopen or tf:
+        if lx == 0:
+            dj = "[MAIN]"
+        elif lx == 1:
+            dj = "[logs]"
+        elif lx == 2:
+            dj = "[debug]"
+        elif lx == 3:
+            dj = "[!!!ERROR!!!]"
+        elif lx == 4:
+            dj = "[I/O]"
+        elif lx == 5:
+            dj = "[Start]"
+        elif lx == 6:
+            dj = "[HH Code]"
+        elif lx == 7:
+            dj = "[Launch]"
+        elif lx == 8:
+            dj = "[HH Code RUNNING]"
+        else:
+            dj = ""
+        file = open(file_neme, "a")
+        print("[" + strftime("%Y/%m/%d,%H:%M:%S") + "]" + dj + " " + str(log))
+        file.write("[" + strftime("%Y/%m/%d,%H:%M:%S") + "]" + dj + " " + str(log) + "\n")
+        file.close()
 
 
 def jdt(ts, dq, db=100):
@@ -542,7 +559,7 @@ class HMLauncher():
     def launcher(self,java="C:\\Program Files\\Java\\jre1.8.0_333\\bin\\java.exe",uuid="0000000000003004998F501A96E01684",name="HMLmc",version="1.19.3"):
         jvm="-Xmx "+str(1028)+"-Djava.library.path="+"连接库"
 
-#class HM
+
 if __name__ == "__main__":
     #hh_help()
     print("当前文件为主文件")
@@ -565,3 +582,125 @@ def mppx(lists):
             if a[j]<a[j+1]:
                 a[j],a[j+1]=a[j+1],a[j]
     return a
+
+
+class HH_Code():
+    """
+    帮助文档：
+    该类参数：（要加载的HHCODE文件，当前程序名）
+    用于加载HH Code代码
+    HH Code代码
+    HH201136@126.com基于python开发的编程语言
+    可以用于创建配置文件
+    执行简单的PYTHON脚本
+    在代码文件前应添加以下文本：
+    #HH Code#
+    #HH Code - (代码版本，应为：（主版本名.副版本名）)
+    #HH Code - (代码名称，可以随便写)
+    #HH Code - (代码应在什么程序中运行，就是类的“当前程序名”参数)
+    #HH Code - (代码作者)
+    """
+    def __init__(self,openfile,mainclass,DEBUG=False):
+        logsinit(DEBUG)
+        logs("开始处理代码",6,True)
+        self.bllist= {}
+        self.forlin=0
+        self.file=open(str(openfile))
+        self.files=self.file.read()
+        logs(self.files,6)
+        self.files=self.files.split("\n")
+        self.file.close()
+        logs(self.files,6)
+        self.head=self.files[:5]
+        self.body=self.files[5:]
+        logs(self.head,6)
+        #self.head[0].replace("#HH Code#")
+        for i in range(1,5):
+            self.head[i]=self.head[i].replace("#HH Code - ","")
+        self.hhcodev=float(self.head[1])
+        self.hhcodename=self.head[2]
+        self.hhcoderunning=self.head[3]
+        self.hhcodeopen=self.head[4]
+        self.nowhhcodev=0.1
+        logs(f"""
+        代码head信息
+        {self.head[0]}
+        使用的HH_CODE执行程序版本：{float(self.head[1])}
+        程序自定义名称：{self.head[2]}
+        应在{self.head[3]}上运行
+        作者：{self.head[4]}
+        """,6,True)
+        if self.hhcodev>self.nowhhcodev:
+            raise HHError("加载的代码使用的HHCODE版本过高！")
+        if self.hhcoderunning != mainclass and self.hhcoderunning != "all" :
+            raise  HHError(f"代码应被{self.hhcoderunning}加载")
+        logs("代码处理完成",6)
+    def __onecode__(self,codes,run):
+        codes=str(codes).split(" ")
+        #print(codes,len(codes))
+        """特殊代码行处理"""
+        if codes[0]=="结束":
+            logs("代码结束",6)
+            return "结束"
+        if codes[0]=="来到":
+            """跳转处理位置代码行"""
+            #print(1)
+            #print(codes[-1])
+            if len(codes)<3:
+                logs(f"跳转至第{int(codes[1])}行代码",6)
+                return int(codes[1])
+            else:
+                if self.forlin>=int(codes[2]):
+                    self.forlin=0
+                    if len(self.body)-1 != run:
+                        return run+1
+                    else:
+                        return "结束"
+                logs(f"跳转至第{int(codes[1])}行代码\n当前循环次数：{self.forlin}",6)
+                self.forlin+=1
+                return int(codes[1])
+        else:
+            """=====普通代码行处理"""
+            if codes[0]=="变量":
+                """=====“变量设置”代码行类型判断"""
+                if codes[2]=="int":
+                    self.bllist[str(codes[1])]=int(codes[3])
+                elif codes[2]=="str":
+                    self.bllist[str(codes[1])]=str(codes[3])
+                elif codes[2]=="float":
+                    self.bllist[str(codes[1])]=float(codes[3])
+            elif codes[0]=="输出":
+                """文本输出  114514！ （"""
+                logs(self.bllist[str(codes[1])],114514,True)
+            elif codes[0]=="日志":
+                """日志输出  判断是否定义类型"""
+                if len(codes) > 2:
+                    logs(self.bllist[str(codes[1])],int(codes[2]),True)
+                else:
+                    logs(self.bllist[str(codes[1])],8,True)
+            elif codes[0]=="等待":
+                """等待"""
+                sleep(float(codes[1]))
+            """=====下一个代码行判断"""
+            if len(self.body)-1 != run:
+                return run+1
+            else:
+                return "结束"
+    def runing(self):
+        logs("代码开始运行……",6,True)
+        #for i in self.body:
+        i=0
+        logs(len(self.body),6)
+        while True:
+            i=self.__onecode__(self.body[i],i)
+            #print(i)
+            if i=="结束":
+                logs("代码运行完成", 6, True)
+                return 0
+
+    def bldown(self):
+        logs("获取代码中的变量",6,True)
+        return self.bllist
+#a=HH_Code("C:\\Users\\Administrator\\Desktop\\mc启动器\\code.txt","HHMCL")
+#a.runing()
+#print(a.bldown())

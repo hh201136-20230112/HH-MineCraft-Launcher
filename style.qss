@@ -1,0 +1,39 @@
+/*
+|    |  |    |    /\    /\    /=====  |
+|=== |  |=== |   /  \  /  \   |       |
+|    |  |    |  /    \/    \  \=====  |=====
+
+HH MineCraft Launcher QSS
+
+HHÖÆ×÷
+ÓÊÏä:hh201136@126.com
+
+*/
+QGroupBox,QPushButton,QComboBox{
+background: #d3f2ff;
+color:#000000;
+border:0px solid #c8ffff;
+border-radius:5px;
+padding:4px 4px;
+}
+QLineEdit,QPushButton,QComboBox{
+border:2px solid #007dff;
+}
+QGroupBox#groupBox_8{
+background: #007dff;
+color:#ffffff;
+border:1px solid #c8ffff;
+border-radius:5px;
+padding:4px 4px;
+}
+QProgressBar{
+background-color: #aaffff;
+border-radius:5px;
+}
+QProgressBar::chunk {
+background-color: #007dff;
+border-radius:5px;
+padding:4px 4px;
+}
+
+/*QGroupBox#groupBox_8 #007dff*/

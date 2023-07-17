@@ -11,7 +11,7 @@
 这是一个用PYTHON编写的简易Minecraft启动器
 作者：hh201136@126.com
 出现问题发送至邮箱"hh201136@126.com"（尽量在1周内回复）
-版本：0.0.1(内测)
+版本：0.2.5
 """
 import os
 
@@ -25,10 +25,11 @@ import javahome
 import mclist
 import memory
 import mcjson
+import threading
 
 # t1 = time.time()
 logs("窗口文件已启动", 0)
-
+print(__name__)
 
 class HHMCLError(Exception):
     def __init__(self, value):
@@ -57,25 +58,34 @@ class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         #uic.loadUi("style.qss", self)
-        #MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        #MainWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        MainWindow.setWindowFlags(QtCore.Qt.SubWindow)
+        MainWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         logs("加载窗口组件信息", 0)
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(590, 530)
-        MainWindow.setMinimumSize(QtCore.QSize(590, 530))
-        MainWindow.setMaximumSize(QtCore.QSize(590, 530))
-        #logs("加载QSS样式表")
-        #f=open("style.qss")
-        #strs=f.readline()
-        #f.close()
-        #MainWindow.setStyleSheet(strs)
+        MainWindow.resize(590, 510)
+        MainWindow.setMinimumSize(QtCore.QSize(590, 510))
+        MainWindow.setMaximumSize(QtCore.QSize(590, 510))
+        strs=""
+        def openqss():
+            global strs
+            logs("加载QSS样式表")
+            f=open("style.qss")
+            strs=""
+            for i in f.readlines():
+                strs+=i
+            f.close()
+            return strs
+        strs=openqss()
+        logs(strs)
+
+        MainWindow.setStyleSheet(strs)
         logs("加载图标")
         MainWindow.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("texture.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet(
-            "QGroupbox{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 255), stop:1 rgba(0, 255, 255, 100));}")
+        #MainWindow.setStyleSheet(
+        #    "QGroupbox{background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 255), stop:1 rgba(0, 255, 255, 100));}")
         logs("加载QT组件")
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -83,11 +93,10 @@ class Ui_MainWindow(object):
         self.centralwidget.setMaximumSize(QtCore.QSize(620, 510))
         self.centralwidget.setObjectName("centralwidget")
         self.groupBox_8 = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox_8.setGeometry(QtCore.QRect(10, 0, 581, 511))
+        self.groupBox_8.setGeometry(QtCore.QRect(0, 0, 591, 511))
         self.groupBox_8.setObjectName("groupBox_8")
-        #self.groupBox_8.setStyleSheet(strs)
         self.groupBox_2 = QtWidgets.QGroupBox(self.groupBox_8)
-        self.groupBox_2.setGeometry(QtCore.QRect(150, 20, 201, 81))
+        self.groupBox_2.setGeometry(QtCore.QRect(160, 20, 201, 81))
         self.groupBox_2.setObjectName("groupBox_2")
         self.comboBox_2 = QtWidgets.QComboBox(self.groupBox_2)
         self.comboBox_2.setGeometry(QtCore.QRect(70, 50, 121, 22))
@@ -102,31 +111,31 @@ class Ui_MainWindow(object):
         self.label_3.setGeometry(QtCore.QRect(10, 50, 81, 21))
         self.label_3.setObjectName("label_3")
         self.groupBox_4 = QtWidgets.QGroupBox(self.groupBox_8)
-        self.groupBox_4.setGeometry(QtCore.QRect(150, 110, 201, 141))
+        self.groupBox_4.setGeometry(QtCore.QRect(160, 110, 201, 141))
         self.groupBox_4.setObjectName("groupBox_4")
         self.groupBox_6 = QtWidgets.QGroupBox(self.groupBox_4)
         self.groupBox_6.setGeometry(QtCore.QRect(10, 60, 181, 71))
         self.groupBox_6.setObjectName("groupBox_6")
         self.comboBox_3 = QtWidgets.QComboBox(self.groupBox_6)
-        self.comboBox_3.setGeometry(QtCore.QRect(10, 20, 161, 22))
+        self.comboBox_3.setGeometry(QtCore.QRect(10, 20, 161, 21))
         self.comboBox_3.setObjectName("comboBox_3")
         self.pushButton_3 = QtWidgets.QPushButton(self.groupBox_6)
-        self.pushButton_3.setGeometry(QtCore.QRect(10, 50, 161, 21))
+        self.pushButton_3.setGeometry(QtCore.QRect(10, 40, 161, 31))
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_4 = QtWidgets.QPushButton(self.groupBox_4)
-        self.pushButton_4.setGeometry(QtCore.QRect(20, 20, 121, 41))
+        self.pushButton_4.setGeometry(QtCore.QRect(20, 20, 121, 31))
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_5 = QtWidgets.QPushButton(self.groupBox_4)
-        self.pushButton_5.setGeometry(QtCore.QRect(150, 20, 41, 41))
+        self.pushButton_5.setGeometry(QtCore.QRect(150, 20, 41, 31))
         self.pushButton_5.setObjectName("pushButton_5")
         self.groupBox_5 = QtWidgets.QGroupBox(self.groupBox_8)
-        self.groupBox_5.setGeometry(QtCore.QRect(360, 20, 211, 231))
+        self.groupBox_5.setGeometry(QtCore.QRect(370, 20, 211, 231))
         self.groupBox_5.setObjectName("groupBox_5")
         self.label_11 = QtWidgets.QLabel(self.groupBox_5)
         self.label_11.setGeometry(QtCore.QRect(13, 20, 181, 201))
         self.label_11.setObjectName("label_11")
         self.groupBox_3 = QtWidgets.QGroupBox(self.groupBox_8)
-        self.groupBox_3.setGeometry(QtCore.QRect(0, 400, 571, 101))
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 400, 571, 101))
         self.groupBox_3.setObjectName("groupBox_3")
         self.label_10 = QtWidgets.QLabel(self.groupBox_3)
         self.label_10.setGeometry(QtCore.QRect(190, 20, 16, 16))
@@ -161,7 +170,7 @@ class Ui_MainWindow(object):
         self.progressBar.setProperty("value", 100)
         self.progressBar.setObjectName("progressBar")
         self.groupBox_7 = QtWidgets.QGroupBox(self.groupBox_8)
-        self.groupBox_7.setGeometry(QtCore.QRect(0, 250, 571, 151))
+        self.groupBox_7.setGeometry(QtCore.QRect(10, 260, 571, 131))
         self.groupBox_7.setObjectName("groupBox_7")
         self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox_7)
         self.lineEdit_2.setGeometry(QtCore.QRect(50, 20, 201, 16))
@@ -182,33 +191,27 @@ class Ui_MainWindow(object):
         self.label_14 = QtWidgets.QLabel(self.groupBox_7)
         self.label_14.setGeometry(QtCore.QRect(170, 40, 54, 12))
         self.label_14.setObjectName("label_14")
-        self.label_15 = QtWidgets.QLabel(self.groupBox_7)
-        self.label_15.setGeometry(QtCore.QRect(10, 60, 61, 16))
-        self.label_15.setObjectName("label_15")
-        self.comboBox_4 = QtWidgets.QComboBox(self.groupBox_7)
-        self.comboBox_4.setGeometry(QtCore.QRect(70, 60, 69, 16))
-        self.comboBox_4.setObjectName("comboBox_4")
         self.label_16 = QtWidgets.QLabel(self.groupBox_7)
-        self.label_16.setGeometry(QtCore.QRect(10, 80, 54, 12))
+        self.label_16.setGeometry(QtCore.QRect(10, 60, 54, 12))
         self.label_16.setObjectName("label_16")
         self.lineEdit_4 = QtWidgets.QLineEdit(self.groupBox_7)
-        self.lineEdit_4.setGeometry(QtCore.QRect(60, 80, 491, 21))
+        self.lineEdit_4.setGeometry(QtCore.QRect(60, 60, 491, 21))
         self.lineEdit_4.setObjectName("lineEdit_4")
         self.label_17 = QtWidgets.QLabel(self.groupBox_7)
-        self.label_17.setGeometry(QtCore.QRect(10, 100, 551, 41))
+        self.label_17.setGeometry(QtCore.QRect(10, 80, 551, 41))
         self.label_17.setObjectName("label_17")
         self.pushButton_2 = QtWidgets.QPushButton(self.groupBox_7)
         self.pushButton_2.setGeometry(QtCore.QRect(270, 20, 151, 31))
         self.pushButton_2.setObjectName("pushButton_2")
         self.label_18 = QtWidgets.QLabel(self.groupBox_7)
-        self.label_18.setGeometry(QtCore.QRect(170, 60, 61, 16))
+        self.label_18.setGeometry(QtCore.QRect(190, 40, 61, 16))
         self.label_18.setObjectName("label_18")
         self.checkBox = QtWidgets.QCheckBox(self.groupBox_7)
-        self.checkBox.setGeometry(QtCore.QRect(230, 60, 71, 16))
+        self.checkBox.setGeometry(QtCore.QRect(250, 40, 16, 16))
         self.checkBox.setText("")
         self.checkBox.setObjectName("checkBox")
         self.groupBox = QtWidgets.QGroupBox(self.groupBox_8)
-        self.groupBox.setGeometry(QtCore.QRect(0, 20, 141, 231))
+        self.groupBox.setGeometry(QtCore.QRect(10, 20, 141, 231))
         self.groupBox.setStyleSheet("")
         self.groupBox.setObjectName("groupBox")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
@@ -241,18 +244,6 @@ class Ui_MainWindow(object):
         logs("窗口组件信息加载完成！", 0)
         self.errors += 1
         self.retranslateUi(MainWindow)
-        logs(jdt("准备加载版本信息和JAVA列表", 0, 4), 0)
-        logs(jdt("准备JAVA列表", 1, 4), 0)
-        data1 = javahome.downjavas()[1]
-        logs(jdt("获取JAVA列表", 2, 4), 0)
-        logs(jdt("准备版本列表", 3, 4), 0)
-        data2 = mclist.downmcs()
-        logs(jdt("获取版本列表", 4, 4), 0)
-        for i in data2:
-            self.comboBox.addItem(i)
-        for i in data1:
-            self.comboBox_2.addItem(i)
-        logs(jdt("完成！", 4, 4), 0)
         self.pushButton.clicked.connect(self.slot1)
         logs("绑定信号/槽：slot1", 0)
         self.errors += 1
@@ -268,7 +259,22 @@ class Ui_MainWindow(object):
         self.pushButton_5.clicked.connect(self.exit)
         logs("绑定信号/槽：exit", 0)
         self.errors += 1
+        logs(jdt("准备加载版本信息和JAVA列表", 0, 4), 0)
+        logs(jdt("准备JAVA列表", 1, 4), 0)
+        data1 = javahome.downjavas()[1]
+        logs(jdt("获取JAVA列表", 2, 4), 0)
+        logs(jdt("准备版本列表", 3, 4), 0)
+        data2 = mclist.downmcs()
+        logs(jdt("获取版本列表", 4, 4), 0)
+        #self.comboBox.addItem("未选择")
+        #self.comboBox_2.addItem("无")
+        for i in data2:
+            self.comboBox.addItem(i)
+        for i in data1:
+            self.comboBox_2.addItem(i)
+        logs(jdt("完成！", 4, 4), 0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.resize(590, 510)
 
     def retranslateUi(self, MainWindow):
         logs("加载窗口组件文字", 0)
@@ -311,7 +317,6 @@ class Ui_MainWindow(object):
         self.lineEdit_3.setText(_translate("MainWindow", "自动"))
         self.lineEdit_3.setPlaceholderText(_translate("MainWindow", "输入游戏UUID"))
         self.label_14.setText(_translate("MainWindow", "MB"))
-        self.label_15.setText(_translate("MainWindow", "启动器QSS:"))
         self.label_16.setText(_translate("MainWindow", "JVM参数:"))
         self.lineEdit_4.setText(_translate("MainWindow", "自动"))
         self.label_17.setText(_translate("MainWindow", "编辑帮助:在选项中输入\"自动\"让启动器根据当前环境自动处理,如果要自定义,启动器会替换以下字符串\n"
@@ -320,7 +325,9 @@ class Ui_MainWindow(object):
         self.label_18.setText(_translate("MainWindow", "调试模式:"))
         self.lineEdit.setText(_translate("MainWindow", sj["name"]))
         self.lineEdit_2.setText(_translate("MainWindow", sj["UUID"]))
-
+        self.progressBar_3.setFormat("")
+        self.progressBar.setFormat("")
+        #隐藏进度条数字
         logs("窗口组件文字加载完成", 0)
         self.errors += 1
 
@@ -335,7 +342,9 @@ class Ui_MainWindow(object):
             #    print(i,end="")
             self.progressBar.setProperty("value", 1)
             self.errors += 1
+            self.progressBar_3.setProperty("value", 100)
             yhm = self.lineEdit.text()
+            self.progressBar_3.setProperty("value", 100)
             if yhm == "":
                 QMessageBox.information(self.pushButton, "输入错误！",
                                         "请输入用户名")
@@ -345,9 +354,24 @@ class Ui_MainWindow(object):
             self.errors += 1
             # logs("file:")
             # for i in files.downdate():logs(i,end="")
+            logs("读取并解压依赖库")
+            self.label_5.setText(_translate("MainWindow", "解压依赖库，可能会造成卡顿"))
+            files.ziplibraryfiles()
+            self.progressBar_3.setProperty("value", 5)
             libslens = files.downdate()
-            self.label_5.setText(_translate("MainWindow", "获取Minecraft资源文件"))
+            self.progressBar_3.setProperty("value", 10)
+            #self.label_5.setText(_translate("MainWindow", "获取Minecraft资源文件"))
             logs(libslens)
+            logs("开始解压……")
+            self.progressBar_3.setProperty("value", 15)
+            j=1
+            for i in libslens:
+                self.label_5.setText(_translate("MainWindow", f"正在解压 ...{i[-10:]}"))
+                files.openlibfiles(i)
+                self.progressBar_3.setProperty("value", int(j/len(libslens)))
+                j+=1
+            self.label_5.setText(_translate("MainWindow", "解压完成"))
+            self.progressBar_3.setProperty("value", 100)
             self.errors += 1
             # -Dminecraft.launcher.brand=HML
             self.starjvm = f' -Xmx{memory.downmemory()}m "-Djava.library.path={os.getcwd()}\\.minecraft\\versions\\{self.dqmcl}\\{self.dqmcl}-natives" -cp "'
@@ -356,59 +380,89 @@ class Ui_MainWindow(object):
             self.label_5.setText(_translate("MainWindow", "拼接JVM参数"))
             self.progressBar.setProperty("value", 5)
             self.star += self.starjvm
+            self.progressBar_3.setProperty("value", 90)
             self.errors += 1
             logs("JVM参数设置完成")
+            self.progressBar_3.setProperty("value", 100)
             # for i in libslens:
             #    self.star+=str(i)
             #    self.star+=";"
             self.progressBar.setProperty("value", 7)
             stago = mcjson.jsonhq(str(self.dqmcl))
+            self.progressBar_3.setProperty("value", 10)
             self.label_5.setText(_translate("MainWindow", "获取MinecraftJSON数据"))
             self.errors += 1
+            self.progressBar_3.setProperty("value", 15)
             # self.star=self.star[:-1]
             self.star += stago[-1]
+            self.progressBar_3.setProperty("value", 20)
             self.star += f'{str(os.getcwd())}\\.minecraft\\versions\\{self.dqmcl}\\{self.dqmcl}.jar'
+            self.progressBar_3.setProperty("value", 30)
             self.star += '"'
+            self.progressBar_3.setProperty("value", 50)
             logs("依赖库读取完成")
             self.errors += 1
+            self.progressBar_3.setProperty("value", 100)
             self.label_5.setText(_translate("MainWindow", "获取Minecraft依赖库"))
             self.progressBar.setProperty("value", 10)
             self.star += " " + stago[0]
+            self.progressBar_3.setProperty("value", 10)
             user = ''
             if stago[2]:
+                self.progressBar_3.setProperty("value", 20)
                 for i in stago[1]:
                     user += i
                     user += " "
+                self.progressBar_3.setProperty("value", 30)
                 user = user[:-1]
+                self.progressBar_3.setProperty("value", 40)
             else:
                 user += stago[1]
+            self.progressBar_3.setProperty("value", 50)
             self.errors += 1
+            self.progressBar_3.setProperty("value", 100)
             self.label_5.setText(_translate("MainWindow", "设置用户配置"))
             self.progressBar.setProperty("value", 15)
             user = user.replace("${auth_player_name}", str(self.lineEdit.text()))
+            self.progressBar_3.setProperty("value", 10)
             user = user.replace("${version_name}", '"HML"')
+            self.progressBar_3.setProperty("value", 20)
             user = user.replace("${game_directory}", '"' + str(os.getcwd()) + '\\.minecraft"')
+            self.progressBar_3.setProperty("value", 30)
             user = user.replace("${assets_root}", '"' + str(os.getcwd()) + '\\.minecraft\\assets"')
+            self.progressBar_3.setProperty("value", 40)
             user = user.replace("${assets_index_name}", stago[3])
+            self.progressBar_3.setProperty("value", 50)
             user = user.replace("${auth_uuid}", self.lineEdit_2.text())
+            self.progressBar_3.setProperty("value", 60)
             user = user.replace("${auth_access_token}", self.lineEdit_2.text())
+            self.progressBar_3.setProperty("value", 70)
             user = user.replace("${user_properties}", "{}")
+            self.progressBar_3.setProperty("value", 80)
             user = user.replace("${user_type}", "legacy")
+            self.progressBar_3.setProperty("value", 90)
             # if int(list(str(self.dqmcl).split("."))[1])>=13:
             # user=user.replace("${version_type}","HH MineCraft Launch")
             self.errors += 1
             self.label_5.setText(_translate("MainWindow", "拼接用户配置"))
+            self.progressBar_3.setProperty("value", 100)
             logs("用户登入信息已处理:" + user)
             self.progressBar.setProperty("value", 20)
+            self.progressBar_3.setProperty("value", 50)
             self.star += " " + user
             self.errors += 1
-            self.progressBar.setProperty("value", 30)
+            self.progressBar_3.setProperty("value", 100)
+            self.progressBar.setProperty("value", 35)
             logs("当前启动脚本")
             self.label_5.setText(_translate("MainWindow", "脚本生成完成"))
             logs(self.star)
+            self.progressBar_3.setProperty("value", 10)
             file = open("minecraftrun.bat", "w")
+            self.progressBar_3.setProperty("value", 30)
             file.write(self.star)
-            file.write('\npause')
+            self.progressBar_3.setProperty("value", 40)
+            if self.checkBox.isChecked():
+                file.write('\npause')
             file.close()
             self.errors += 1
             logs("指令写入完成")
@@ -443,12 +497,13 @@ class Ui_MainWindow(object):
             self.progressBar.setProperty("value", 75)
             logs("启动指令运行完成")
             self.progressBar.setProperty("value", 100)
+            self.progressBar_3.setProperty("value", 100)
             self.label_5.setText(_translate("MainWindow", "启动完成！"))
         except:
             QMessageBox.information(self.pushButton, "DEBUG",
                                     "程序出现错误！\n可能出现的问题：\n是否选择了游戏版本或JAVA")
             raise HHMCLError(
-                f"程序在启动游戏时出现错误,可能未选择版本或JAVA/JDK,或者启动器不支持该版本 \n 错误代码:{self.errors}")
+                f"程序在启动游戏时出现错误,可能未选择版本或JAVA/JDK,或者启动器不支持该版本 \n                  错误代码:{self.errors}")
 
     def slot2(self):
         logs("程序slot2信号/槽被程序调用！", 0)
@@ -493,3 +548,18 @@ class Ui_MainWindow(object):
         logs("程序退出")
         self.down()
         raise HHMCLError("程序退出")
+
+    def tike(self):
+        _translate = QtCore.QCoreApplication.translate
+        t=0
+        while True:
+            if t>=20:
+                self.label_7.setText(_translate("MainWindow", str(memory.downmemorytike())))
+                t=0
+            t+=1
+
+    def runtike(self):
+        runing=threading.Thread(target=self.tike)
+        #设置多线程类
+        runing.start()
+        #启动线程

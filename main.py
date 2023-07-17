@@ -11,7 +11,7 @@ t1 = time.time()
 import Mainwin
 from PyQt5.QtCore import QStringListModel
 from PyQt5.QtWidgets import QApplication, QMainWindow
-print(r"""
+logs(r"""
 |    |  |    |    /\    /\    /=====  |
 |=== |  |=== |   /  \  /  \   |       |
 |    |  |    |  /    \/    \  \=====  |=====
@@ -37,6 +37,7 @@ if __name__ == '__main__':
     appui.setupUi(appwin)
     appwin.show()
     logs(f"加载完成！用时{time.time() - t1}", 0)
+    appui.runtike()
     try:
         sys.exit(app.exec_())
     finally:
